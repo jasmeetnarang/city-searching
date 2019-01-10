@@ -1,25 +1,41 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import axios from 'axios';
 import './App.css';
+import Cards from './Cards';
 
 class App extends Component {
-  render() {
+    constructor(props) {
+        super(props);
+        this.state = {
+            city : " ",
+            zipCode : []
+            
+        };
+    }
+    handleChange(e) {
+        this.setState({ city: e.target.value });
+    }
+
+    handleSearch(e) {
+        axios.get("http://ctp-zip-api.herokuapp.com/city/" + this.state.city)
+            .then(response => {
+                this.setState({ zipCode: response.data });
+            })
+            .catch(err => {
+                this.setState({ zipCode: [] })
+                console.log(err)
+            })
+    }
+
+    render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <div className="App">
+            <h2>City Search</h2>
+            <p>City:
+                <input type="text" onChange={this.handleChange.bind(this)} />
+                <button onClick={this.handleSearch.bind(this)}>Search</button>
+            </p>
+            <Cards zC={this.state.zipCode} />
       </div>
     );
   }
